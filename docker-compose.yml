@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  dev:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/workspace
+    environment:
+      - PYTHONPATH=/workspace
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+  ml:
+    build: .
+    volumes:
+      - .:/workspace
+      - ./data:/workspace/data
+    ports:
+      - "8888:8888"
+    environment:
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, utility, compute]
+    # Uncomment the following for MPS (Apple Silicon) support
+    # runtime: nvidia
+    # environment:
+    #   - PYTORCH_ENABLE_MPS_FALLBACK=1
+    #   - PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 
