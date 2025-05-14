@@ -28,4 +28,4 @@ EXPOSE 8080
 ENV PYTHONUNBUFFERED=1
 
 # Start VS Code server
-CMD ["code-server", "--bind-addr", "0.0.0.0:8080", "--auth", "none"] 
+CMD ["code-server", "--bind-addr", "0.0.0.0:8080", "--auth", "none"]

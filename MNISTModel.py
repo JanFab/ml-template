@@ -1,10 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
 import pytorch_lightning as pl
-import os
 
 class MNISTModel(pl.LightningModule):
     def __init__(self):
@@ -62,20 +59,4 @@ class MNISTModel(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=1e-3)
-
-    def train_dataloader(self):
-        transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,))
-        ])
-        dataset = datasets.MNIST('./data', train=True, download=True, transform=transform)
-        return DataLoader(dataset, batch_size=64, num_workers=4)
-
-    def val_dataloader(self):
-        transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,))
-        ])
-        dataset = datasets.MNIST('./data', train=False, transform=transform)
-        return DataLoader(dataset, batch_size=64, num_workers=4) 
+        return torch.optim.Adam(self.parameters(), lr=1e-3) 
