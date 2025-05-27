@@ -1,133 +1,136 @@
 # MNIST Classification Project
 
-This project implements a PyTorch Lightning-based MNIST digit classification model with a FastAPI service for model inference and a web interface for easy interaction.
+A clean, production-ready MNIST classification project using PyTorch Lightning and MLflow.
 
 ## Project Structure
 
 ```
-.
-├── experiment.py      # Training script
-├── api.py            # FastAPI server
-├── index.html        # Web interface
-├── MNISTModel.py     # Model architecture
-├── MnistDataModule.py # Data loading module
-├── utils.py          # Utility functions
-├── requirements.txt  # Project dependencies
-└── logs/            # Training logs and model checkpoints
+mnist-classification/
+├── configs/                 # Configuration files
+│   ├── development.yaml    # Development environment config
+│   ├── production.yaml     # Production environment config
+│   └── testing.yaml        # Testing environment config
+├── src/                    # Source code
+│   ├── data/              # Data loading and processing
+│   │   └── mnist_data_module.py
+│   ├── models/            # Model definitions
+│   │   ├── base.py
+│   │   └── mnist_model.py
+│   └── utils/             # Utility functions
+│       └── visualization.py
+├── tests/                 # Unit tests
+│   └── test_models.py
+├── scripts/               # Training script
+│   └── train.py
+├── pyproject.toml         # Project configuration and dependencies
+├── requirements-dev.txt   # Development dependencies with exact versions
+└── README.md             # This file
 ```
 
-## Setup
+## Features
 
-1. Create a virtual environment (recommended):
-```bash
+- **Clean Architecture**: Modular and maintainable code structure
+- **Environment Management**: Separate configurations for development, testing, and production
+- **Experiment Tracking**: MLflow integration for tracking experiments
+- **Type Hints**: Full type annotation support
+- **Testing**: Comprehensive test suite
+- **Code Quality**: Black, isort, and mypy for code quality
+
+## Quick Start
+
+1. Create and activate a virtual environment:
+```powershell
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+.\venv\Scripts\activate
 ```
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
+2. Install the package in development mode:
+```powershell
+pip install -e ".[dev]"
 ```
 
-## Training the Model
-
-To train the model, run:
-```bash
-python experiment.py
+3. Train the model:
+```powershell
+python scripts/train.py --env development
 ```
 
-This will:
-- Train the model for 3 epochs
-- Save checkpoints in the `logs` directory
-- Generate visualizations of predictions and confusion matrix
-
-## Running the API Server
-
-1. Start the API server:
-```bash
-python api.py
+4. View experiment results:
+```powershell
+mlflow ui
 ```
 
-The server will start at `http://localhost:8000`
+## Development
 
-## API Endpoints
+### Code Quality
 
-### 1. Root Endpoint
-- **URL**: `/`
-- **Method**: GET
-- **Response**: Welcome message and usage instructions
+The project uses several tools to maintain code quality:
 
-### 2. Prediction Endpoint
-- **URL**: `/predict`
-- **Method**: POST
-- **Input**: Image file (any format)
-- **Response**: JSON containing:
-  - `prediction`: Predicted digit (0-9)
-  - `probabilities`: List of probabilities for each digit
+- **Black**: Code formatting
+- **isort**: Import sorting
+- **mypy**: Type checking
+- **pytest**: Testing
 
-## Example Usage
+Run them directly:
+```powershell
+# Format code
+black src tests
+isort src tests
 
-### Using curl
-```bash
-curl -X POST -F "file=@path/to/your/image.png" http://localhost:8000/predict
+# Run code quality checks
+mypy src
+flake8 src tests
+
+# Run tests
+pytest
 ```
 
-### Using Python requests
-```python
-import requests
+### Environment-Specific Training
 
-url = "http://localhost:8000/predict"
-files = {"file": open("path/to/your/image.png", "rb")}
-response = requests.post(url, files=files)
-print(response.json())
+The project supports different environments:
+
+- **Development** (default):
+```powershell
+python scripts/train.py --env development
 ```
 
-## Model Details
-
-- Architecture: PyTorch Lightning-based neural network
-- Input: 28x28 grayscale images
-- Output: Digit classification (0-9)
-- Training: Uses early stopping and model checkpointing
-- Hardware: Automatically uses available GPU/MPS if available
-
-## Notes
-
-- The API automatically preprocesses images to match MNIST format:
-  - Converts to grayscale
-  - Resizes to 28x28 pixels
-  - Normalizes pixel values
-  - Inverts colors (MNIST has white digits on black background)
-- Make sure the model checkpoint exists at `logs/mnist-02-0.12.ckpt` before starting the API server
-
-## Web Interface
-
-The project includes a modern web interface for easy interaction with the model. To use it:
-
-1. Start the API server:
-```bash
-python api.py
+- **Testing**:
+```powershell
+python scripts/train.py --env testing
 ```
 
-2. Open `index.html` in your web browser. You can do this by:
-   - Double-clicking the file in your file explorer
-   - Using a simple HTTP server:
-     ```bash
-     # Using Python's built-in HTTP server
-     python -m http.server 8080
-     # Then visit http://localhost:8080 in your browser
-     ```
+- **Production**:
+```powershell
+python scripts/train.py --env production
+```
 
-The web interface features:
-- Drag and drop image upload
-- Live image preview
-- Real-time predictions with probability bars
-- Responsive design that works on both desktop and mobile
-- Error handling and loading states
+### Configuration
 
-## Requirements
+Environment-specific configurations are in the `configs/` directory:
+- `development.yaml`: Development settings
+- `production.yaml`: Production settings
+- `testing.yaml`: Testing settings
 
-- Python 3.8+
-- PyTorch 2.0+
-- PyTorch Lightning 2.0+
-- FastAPI 0.68+
-- Other dependencies listed in requirements.txt 
+## Project Structure Details
+
+- **src/**: Core package code
+  - `data/`: Data loading and processing modules
+  - `models/`: Model definitions and training logic
+  - `utils/`: Utility functions and helpers
+
+- **configs/**: Configuration files for different environments
+
+- **tests/**: Unit tests and test utilities
+
+- **scripts/**: Training script
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run the tests and code quality checks
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

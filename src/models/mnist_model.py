@@ -4,18 +4,20 @@ import torch.nn.functional as F
 import pytorch_lightning as pl
 
 class MNISTModel(pl.LightningModule):
-    def __init__(self):
+    def __init__(self, config):
         super().__init__()
+        self.learning_rate = config['model']['learning_rate']
+        
+        # Model layers
         self.conv1 = nn.Conv2d(1, 32, 3, 1)
         self.conv2 = nn.Conv2d(32, 64, 3, 1)
         self.dropout1 = nn.Dropout(0.25)
         self.dropout2 = nn.Dropout(0.5)
-        # Calculate the size of the flattened features
-        # After two conv layers with kernel size 3 and stride 1, and max pooling with kernel size 2
-        # Input size: 28x28 -> conv1 -> 26x26 -> conv2 -> 24x24 -> maxpool -> 12x12
-        # Final feature map size: 12x12x64 = 9216
-        self.fc1 = nn.Linear(12 * 12 * 64, 128)
+        self.fc1 = nn.Linear(9216, 128)  # Fixed hidden size of 128
         self.fc2 = nn.Linear(128, 10)
+        
+        # Loss function
+        self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x):
         x = self.conv1(x)
@@ -30,33 +32,25 @@ class MNISTModel(pl.LightningModule):
         x = self.dropout2(x)
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
-
+    
     def training_step(self, batch, batch_idx):
         x, y = batch
         logits = self(x)
-        loss = F.nll_loss(logits, y)
+        loss = self.criterion(logits, y)
         self.log('train_loss', loss)
         return loss
-
+    
     def validation_step(self, batch, batch_idx):
         x, y = batch
         logits = self(x)
-        loss = F.nll_loss(logits, y)
-        preds = torch.argmax(logits, dim=1)
-        acc = (preds == y).float().mean()
+        loss = self.criterion(logits, y)
         self.log('val_loss', loss)
-        self.log('val_acc', acc)
-        return loss
-
+    
     def test_step(self, batch, batch_idx):
         x, y = batch
         logits = self(x)
-        loss = F.nll_loss(logits, y)
-        preds = torch.argmax(logits, dim=1)
-        acc = (preds == y).float().mean()
+        loss = self.criterion(logits, y)
         self.log('test_loss', loss)
-        self.log('test_acc', acc)
-        return loss
-
+    
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=1e-3) 
+        return torch.optim.Adam(self.parameters(), lr=self.learning_rate) 

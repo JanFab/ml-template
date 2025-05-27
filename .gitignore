@@ -35,14 +35,27 @@ ENV/
 .ipynb_checkpoints
 *.ipynb
 
-# ML/DL
+# MLflow
+mlruns/
+
+# Project specific
 data/
 logs/
-checkpoints/
-*.pth
 *.pt
+*.pth
+*.ckpt
 *.h5
-*.onnx
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# Distribution
+dist/
+build/
+*.egg-info/
 
 # Docker
 .docker/
