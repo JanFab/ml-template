@@ -5,9 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mnist-classification"
 version = "0.1.0"
-description = "Simple MNIST Classification with PyTorch"
+description = "MNIST Classification with PyTorch and FastAPI"
 requires-python = ">=3.8"
 dependencies = [
+    # ML dependencies
     "torch>=2.0.0",
     "torchvision>=0.15.0",
     "pytorch-lightning>=2.0.0",
@@ -15,7 +16,26 @@ dependencies = [
     "numpy>=1.24.0",
     "mlflow>=2.8.0",
     "pyyaml>=6.0.0",
+    # API dependencies
+    "fastapi>=0.68.0",
+    "uvicorn>=0.15.0",
+    "python-multipart>=0.0.5",
+    "pillow>=9.0.0",
+    # Development dependencies
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "isort>=5.0.0",
+    "flake8>=4.0.0",
 ]
 
 [tool.setuptools]
-packages = ["src"] 
+packages = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3 

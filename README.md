@@ -1,136 +1,138 @@
-# MNIST Classification Project
+# MNIST Classification Service
 
-A clean, production-ready MNIST classification project using PyTorch Lightning and MLflow.
+A microservice-based MNIST classification system using PyTorch, FastAPI, and Kubernetes.
 
 ## Project Structure
 
 ```
-mnist-classification/
-├── configs/                 # Configuration files
-│   ├── development.yaml    # Development environment config
-│   ├── production.yaml     # Production environment config
-│   └── testing.yaml        # Testing environment config
-├── src/                    # Source code
-│   ├── data/              # Data loading and processing
-│   │   └── mnist_data_module.py
-│   ├── models/            # Model definitions
-│   │   ├── base.py
-│   │   └── mnist_model.py
-│   └── utils/             # Utility functions
-│       └── visualization.py
-├── tests/                 # Unit tests
-│   └── test_models.py
-├── scripts/               # Training script
-│   └── train.py
-├── pyproject.toml         # Project configuration and dependencies
-├── requirements-dev.txt   # Development dependencies with exact versions
-└── README.md             # This file
+ml/
+├── .github/                      # GitHub Actions workflows
+│   └── workflows/
+│       ├── ci.yml               # Continuous Integration
+│       └── cd.yml               # Continuous Deployment
+│
+├── src/                         # Source code
+│   ├── api/                     # API service
+│   │   └── main.py             # FastAPI application
+│   │
+│   ├── ml_service/             # ML service
+│   │   └── models.py           # PyTorch model
+│   │
+│   └── shared/                 # Shared utilities
+│
+├── containers/                  # Container definitions
+│   └── api/                    # API service container
+│       └── Dockerfile
+│
+├── k8s/                        # Kubernetes configurations
+│   ├── base/                   # Base configurations
+│   └── overlays/               # Environment-specific configs
+│       ├── development/
+│   └── production/
+│
+├── configs/                    # Configuration files
+│   ├── api/
+│   └── ml_service/
+│
+├── tests/                      # Test files
+├── data/                       # Data directory
+└── notebooks/                  # Jupyter notebooks
 ```
 
-## Features
+## Setup
 
-- **Clean Architecture**: Modular and maintainable code structure
-- **Environment Management**: Separate configurations for development, testing, and production
-- **Experiment Tracking**: MLflow integration for tracking experiments
-- **Type Hints**: Full type annotation support
-- **Testing**: Comprehensive test suite
-- **Code Quality**: Black, isort, and mypy for code quality
+### Prerequisites
 
-## Quick Start
+- Python 3.9+
+- Docker
+- Kubernetes cluster
+- kubectl
+- kustomize
 
-1. Create and activate a virtual environment:
-```powershell
-python -m venv venv
-.\venv\Scripts\activate
+### Development Setup
+
+1. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Linux/Mac
+   .\venv\Scripts\activate   # Windows
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install .
+   ```
+
+3. Run tests:
+   ```bash
+   pytest tests/
+   ```
+
+### Container Build
+
+Build the API container:
+```bash
+docker build -t mnist-api:latest -f containers/api/Dockerfile .
 ```
 
-2. Install the package in development mode:
-```powershell
-pip install -e ".[dev]"
-```
+### Kubernetes Deployment
 
-3. Train the model:
-```powershell
-python scripts/train.py --env development
-```
+1. Development:
+   ```bash
+   kustomize build k8s/overlays/development | kubectl apply -f -
+   ```
 
-4. View experiment results:
-```powershell
-mlflow ui
-```
+2. Production:
+   ```bash
+   kustomize build k8s/overlays/production | kubectl apply -f -
+   ```
 
-## Development
+## API Endpoints
 
-### Code Quality
+- `GET /`: Health check endpoint
+- `POST /predict`: Upload an image for MNIST digit classification
 
-The project uses several tools to maintain code quality:
+## CI/CD Options
 
-- **Black**: Code formatting
-- **isort**: Import sorting
-- **mypy**: Type checking
-- **pytest**: Testing
+The project supports multiple CI/CD platforms:
 
-Run them directly:
-```powershell
-# Format code
-black src tests
-isort src tests
+### GitHub Actions
+- Located in `.github/workflows/`
+- `ci.yml`: Runs tests and linting
+- `cd.yml`: Builds and deploys to Kubernetes
 
-# Run code quality checks
-mypy src
-flake8 src tests
+### GitLab CI/CD
+- Located in `.gitlab-ci.yml`
+- Stages: test, lint, build, deploy
+- Uses GitLab Container Registry
+- Supports manual deployment to production
+- Environment-specific deployments
 
-# Run tests
-pytest
-```
+### Azure DevOps
+- Located in `azure-pipelines.yml`
+- Stages: Test, Build, Deploy
+- Uses Azure Container Registry
+- Environment-specific deployments
+- Manual approval for production
 
-### Environment-Specific Training
+Required Variables:
+- GitLab:
+  - `KUBE_CONTEXT_DEV`: Development cluster context
+  - `KUBE_CONTEXT_PROD`: Production cluster context
+  - `CI_REGISTRY`: Container registry URL
+  - `CI_REGISTRY_USER`: Registry username
+  - `CI_REGISTRY_PASSWORD`: Registry password
 
-The project supports different environments:
+- Azure DevOps:
+  - `ACR_NAME`: Azure Container Registry name
+  - `KUBE_SERVICE_CONNECTION_DEV`: Development cluster connection
+  - `KUBE_SERVICE_CONNECTION_PROD`: Production cluster connection
 
-- **Development** (default):
-```powershell
-python scripts/train.py --env development
-```
+## Future Improvements
 
-- **Testing**:
-```powershell
-python scripts/train.py --env testing
-```
-
-- **Production**:
-```powershell
-python scripts/train.py --env production
-```
-
-### Configuration
-
-Environment-specific configurations are in the `configs/` directory:
-- `development.yaml`: Development settings
-- `production.yaml`: Production settings
-- `testing.yaml`: Testing settings
-
-## Project Structure Details
-
-- **src/**: Core package code
-  - `data/`: Data loading and processing modules
-  - `models/`: Model definitions and training logic
-  - `utils/`: Utility functions and helpers
-
-- **configs/**: Configuration files for different environments
-
-- **tests/**: Unit tests and test utilities
-
-- **scripts/**: Training script
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run the tests and code quality checks
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+- Add Kafka integration for async processing
+- Implement model versioning
+- Add monitoring and logging
+- Implement A/B testing
+- Add more comprehensive testing
+- Implement model retraining pipeline

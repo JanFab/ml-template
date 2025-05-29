@@ -5,8 +5,7 @@ import torch
 import numpy as np
 from PIL import Image
 import io
-from MNISTModel import MNISTModel
-import pytorch_lightning as pl
+from ml_service.models import MNISTModel
 
 app = FastAPI(title="MNIST Classification API")
 

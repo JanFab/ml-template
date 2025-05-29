@@ -52,7 +52,7 @@ def main():
     # Initialize MLflow logger
     mlflow_logger = MLFlowLogger(
         experiment_name=config['logging']['experiment_name'],
-        tracking_uri=config['loging']['tracking_uri']
+        tracking_uri=config['logging']['tracking_uri']
     )
     
     # Initialize trainer
