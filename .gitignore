@@ -39,7 +39,7 @@ ENV/
 mlruns/
 
 # Project specific
-data/
+datasets/
 logs/
 *.pt
 *.pth
