@@ -1,0 +1,3 @@
+checkpoint_path: mlruns/999465119656957176/e9c050ee3a3b48d88e2bb2b479499768/checkpoints/mnist-epoch=03-val_loss=0.02.ckpt
+model:
+  learning_rate: 0.001 
